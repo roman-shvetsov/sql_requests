@@ -1,0 +1,69 @@
+CREATE TABLE vid(
+kod_vida INT,
+kontinent VARCHAR(30),
+namevid VARCHAR(50),
+semeistvo VARCHAR(50),
+PRIMARY KEY (kod_vida));
+
+CREATE TABLE pomeshenie(
+kod_pomeshenia INT,
+name_room VARCHAR(40),
+otoplenie VARCHAR(5),
+vodoem VARCHAR(5),
+PRIMARY KEY (kod_pomeshenia));
+
+CREATE TABLE razmeshenie(
+kod_razmeshenia INT,
+kol_animals INT,
+kod_pomeshenia INT,
+PRIMARY KEY (kod_razmeshenia),
+FOREIGN KEY (kod_pomeshenia) REFERENCES pomeshenie (kod_pomeshenia));
+
+CREATE TABLE animal(
+kod_animal INT,
+namess VARCHAR(30),
+dateofb DATE,
+ist_post VARCHAR(50),
+kod_vida INT,
+kod_razmeshenia INT,
+PRIMARY KEY (kod_animal),
+FOREIGN KEY (kod_razmeshenia) REFERENCES razmeshenie (kod_razmeshenia),
+FOREIGN KEY (kod_vida) REFERENCES vid (kod_vida));
+
+CREATE TABLE dostup(
+kod_dostupa INT,
+kod_pomeshenia INT,
+PRIMARY KEY (kod_dostupa),
+FOREIGN KEY (kod_pomeshenia) REFERENCES pomeshenie (kod_pomeshenia));
+
+CREATE TABLE zp(
+kod_zp INT,
+oklad INT,
+proc_premii INT,
+PRIMARY KEY (kod_zp));
+
+CREATE TABLE produkti(
+kod_produktov INT,
+nazvanie VARCHAR(40),
+PRIMARY KEY (kod_produktov));
+
+
+CREATE TABLE pitanie(
+kod_pitania INT,
+kol INT,
+kod_produktov INT,
+kod_animal INT,
+FOREIGN KEY (kod_produktov) REFERENCES produkti (kod_produktov),
+FOREIGN KEY (kod_animal) REFERENCES animal (kod_animal));
+
+CREATE TABLE sotr(
+kod_sotr INT,
+namess VARCHAR(30),
+lastname VARCHAR(30),
+otchestvo VARCHAR(30),
+dateofb DATE,
+kod_zp INT,
+kod_dostupa INT,
+PRIMARY KEY (kod_sotr),
+FOREIGN KEY (kod_dostupa) REFERENCES dostup (kod_dostupa),
+FOREIGN KEY (kod_zp) REFERENCES zp (kod_zp));
