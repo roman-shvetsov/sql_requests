@@ -1,0 +1,61 @@
+WITH RECURSIVE date(dt) AS (
+    SELECT CURRENT_DATE::date
+    UNION ALL
+    SELECT (dt + (FLOOR(RANDOM() * 6) + 2) * INTERVAL '1 DAY')::date
+    FROM date
+)
+SELECT * FROM date
+LIMIT 100;
+
+
+SELECT e.employee_id, name, SUM(price) AS sale_s, 
+		RANK() OVER (ORDER BY SUM(price) DESC) AS sales_rank_s,
+		COUNT(price) AS sales_c,
+		RANK() OVER (ORDER BY COUNT(price) DESC) AS sales_rank_c
+FROM employee e
+JOIN sales s
+ON e.employee_id = s.employee_id
+GROUP BY e.employee_id
+ORDER BY e.employee_id;
+
+
+CREATE TABLE transfers (
+  from_ INT,
+  to_ INT,
+  amount INT,
+  tdate DATE
+);
+
+INSERT INTO transfers VALUES
+  (1, 2, 500, '2023-02-23'),
+  (2, 3, 300, '2023-03-01'),
+  (3, 1, 200, '2023-03-05'),
+  (1, 3, 400, '2023-04-05');
+
+SELECT 
+  account_id AS acc,
+  date AS dt_from,
+  COALESCE(next_date, '3000-01-01') AS dt_to,
+  balance
+FROM (
+  SELECT 
+    account_id,
+    date,
+    LEAD(date) OVER (PARTITION BY account_id ORDER BY date) AS next_date,
+    SUM(amount) OVER (PARTITION BY account_id ORDER BY date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS balance
+  FROM (
+    SELECT 
+      from_ AS account_id,
+      tdate AS date,
+      -amount AS amount
+    FROM transfers
+    UNION ALL
+    SELECT 
+      to_ AS account_id,
+      tdate AS date,
+      amount AS amount
+    FROM transfers
+  ) AS subquery
+) AS subquery2
+ORDER BY account_id, date;
+
